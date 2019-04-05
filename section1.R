@@ -7,6 +7,5 @@ library('dplyr')
 library('ggplot2')
 library('stringr')
 library('lubridate')
-qog <- read_csv("~/Documents/GitHub/qpg.csv")
+qog <- read.csv("~/Documents/GitHub/qog.csv")
 print(dim(qog))
-
