@@ -47,6 +47,9 @@ for (i in 1:1000) {
 #1.(l)
 regreg <- lm(y ~ x)
 summary (regreg)
+#These results show that there is no significant correlation between y and x. 
+#This makes sense because each vector is comprised of elements randomly sampled from a normal distribution. 
+#No correlation is expected.
 
 #2.(a)
 setwd("~/Documents/GitHub/MMSS_311_2")
@@ -54,12 +57,14 @@ pums <- read.csv("/Users/aaroncoates/Downloads/HW0-master/pums_chicago.csv")
 
 #2.(b)
 print(dim(pums))
+#There are 204 variables.
 
 #2.(c)
 mean(pums$PINCP, na.rm=TRUE)
 
 #2.(d)
 pums$logpincp <- (log(pums$PINCP))
+#NaN values are produced because some individuals have negative PINCP inputs, so it is impossible to take the log.
 
 #2.(e)
 pums$GRAD.DUMMY <- ifelse(pums$SCHL>=18, "grad", "no grad")
@@ -114,6 +119,9 @@ summary(regvi)
 cuteresid <- resid(regvi)
 cutefit <- fitted(regvi)
 plot(cutefit, cuteresid, ylab="Residuals", xlab="Fitted Values", col = "turquoise")
+#This plot shows that there is not a linear relationship between wage and hours worked per week.
+#This is because as the the fitted value increases, so does the error.
+#If the relationship was linear, this plot would show a horizontal trend line at value zero.
 
 #2.(l)(i)
 data("mtcars")
@@ -142,3 +150,5 @@ mtcars$forwardgears <- ifelse(mtcars$gear>4, "five", ifelse(mtcars$gear>3 & mtca
 ggplot(mtcars, aes(wt, mpg, col=transmission, shape=forwardgears)) + geom_point() +
   scale_color_manual(values=c("black", "blue")) + xlab("weight") + ylab("miles per gallon") + 
   labs(shape="gears") + theme(panel.background = element_rect(fill="#C6B7FF"))
+
+
