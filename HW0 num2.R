@@ -65,7 +65,9 @@ summary(regvi)
 #2.(k)(vii)
 cuteresid <- resid(regvi)
 cutefit <- fitted(regvi)
+pdf(file="2kvii.pdf")
 plot(cutefit, cuteresid, ylab="Residuals", xlab="Fitted Values", col = "turquoise")
+dev.off()
 #This plot shows that there is not a linear relationship between wage and hours worked per week.
 #This is because as the the fitted value increases, so does the error.
 #If the relationship was linear, this plot would show a horizontal trend line at value zero.
@@ -94,6 +96,8 @@ summary(hittheneighneigh)
 library(ggplot2)
 mtcars$transmission <- ifelse(mtcars$am>0, "manual", "automatic")
 mtcars$forwardgears <- ifelse(mtcars$gear>4, "five", ifelse(mtcars$gear>3 & mtcars$gear<=4, "four", "three"))
+pdf(file="2m.pdf")
 ggplot(mtcars, aes(wt, mpg, col=transmission, shape=forwardgears)) + geom_point() +
   scale_color_manual(values=c("black", "blue")) + xlab("weight") + ylab("miles per gallon") + 
   labs(shape="gears") + theme(panel.background = element_rect(fill="#C6B7FF"))
+dev.off()

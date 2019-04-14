@@ -1,7 +1,7 @@
 setwd("~/Documents/GitHub/MMSS_311_2")
 
 #1.(a)
-x <- c(1, 2, 3, 4, 5)
+a1 <- c(1, 2, 3, 4, 5)
 
 #1.(b)
 Mindy <- 12
