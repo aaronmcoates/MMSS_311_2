@@ -1,0 +1,107 @@
+---
+title: "HW1 Number1"
+author: "Aaron Coates"
+date: "4/17/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd("~/Documents/GitHub/MMSS_311_2")
+sick <- read.csv("/Users/aaroncoates/Downloads/sick_data.csv")
+
+library(dplyr)
+library(ggplot2)
+library(glmnet)
+library(broom)
+library(aod)
+```
+
+First, I turn positive results to "1" and negative results to "0".
+```{r}
+sick$result.d <- sapply(sick$result, function(x){
+  if(x == "Positive"){
+    1
+  } else {
+    0
+  }})
+```
+
+This is the OLS regression.
+```{r}
+regOLS <- glm(result.d ~ temp + bp, data=sick) %>% broom::tidy()
+regOLS
+for (i in 1:1000) {sick$predictionOLS[i] <- 
+  regOLS[1, 2] + regOLS[2, 2]*sick$temp[i] + regOLS[3,2]*sick$bp[i]}
+```
+
+Above, I generated predicted values using the OLS regression. I summarize the results below.
+```{r}
+(sum(with(sick, result.d==1 & predictionOLS>=.5)) + 
+   sum(with(sick, result.d==0 & predictionOLS<=.5)))/1000
+```
+
+So, the model is accurate 96.4% of the time.
+Now, I will rearrange variables to find the line of best fit.
+```{r}
+intOLS <- (regOLS[1, 2] -.5)/(-regOLS[3, 2]) 
+slopeyOLS <- regOLS[2, 2]/(-regOLS[3,2])
+intOLS
+slopeyOLS
+```
+
+I plot the results below.
+```{r}
+plotOLS <- ggplot(data = sick, aes(x = temp, y = bp, col=result)) + 
+  geom_point() + geom_abline(intercept = intOLS[1, 1], 
+  slope = slopeyOLS[1, 1]) +
+  labs(title ="OLS", x = "Temperature", y = "Blood Pressure")
+```
+
+```{r, echo=FALSE}
+plotOLS
+```
+
+Now, I will perform the logistic regression.
+```{r}
+sick$result <- factor(sick$result)
+logit <- glm(result ~ temp + bp, data = sick, 
+             family = "binomial") %>% broom::tidy()
+logit
+```
+
+Now, I will generate predicted values and then summarize the results.
+```{r}
+for (i in 1:1000) {sick$predictionLOGIT[i] <- 
+  logit[1, 2] + logit[2, 2]*sick$temp[i] + logit[3,2]*sick$bp[i]}
+```
+
+```{r}
+(sum(with(sick, result.d==1 & predictionLOGIT>=.5)) + 
+   sum(with(sick, result.d==0 & predictionLOGIT<=.5))) / 1000
+```
+
+So, the model is 99.2% accurate. Now, I will find the line of best fit by rearranging coefficients.
+```{r}
+intLOG <- (logit[1, 2] -.5)/(-logit[3, 2]) 
+slopeyLOG <- logit[2, 2]/(-logit[3,2])
+intLOG
+slopeyLOG
+```
+
+```{r}
+plotLOG <- ggplot(data = sick, aes(x = temp, y = bp, col=result)) + 
+  geom_point() + geom_abline(intercept = intLOG[1, 1], 
+  slope = slopeyLOG[1, 1]) + labs(title ="Logit", 
+  x = "Temperature", y = "Blood Pressure")
+```
+
+```{r, echo=FALSE}
+plotLOG
+```
+

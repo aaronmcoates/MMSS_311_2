@@ -1,0 +1,95 @@
+---
+title: "HW1 Num2"
+author: "Aaron Coates"
+date: "4/17/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd("~/Documents/GitHub/MMSS_311_2")
+wid <- read.csv("/Users/aaroncoates/Downloads/widget_data.csv")
+
+library(dplyr)
+library(ggplot2)
+library(glmnet)
+library(broom)
+library(aod)
+```
+
+Need to plot dependent variable.****
+First, I perform the ridge regression, with lambda ranging from 1/100 to 100.
+```{r}
+grid=10^seq(2,-2,length=100)
+ridge <- glmnet(x = as.matrix(wid[, -1]), y = wid$y, alpha=0, lambda=grid)
+```
+
+```{r}
+ridge1 <- tidy(ridge)
+```
+
+Now, I will plot the coefficients as lambda changes.
+```{r, echo=FALSE}
+ggplot(data=ridge1, aes(x=log10(lambda), y=estimate, colour=term)) + 
+  geom_line() + labs(title ="Ridge Coefficients", 
+  x = "Log(Lambda)", y = "Coefficient Estimate") +
+  coord_cartesian(xlim = c(-2,2), ylim = c(-1, 1))
+```
+
+Now, I will crossvalidate the data and plot the results.
+```{r}
+crossval <- cv.glmnet(x = as.matrix(wid[, -1]), y = wid$y, alpha=0, lambda=grid)
+```
+```{r, echo=FALSE}
+plot(crossval)
+```
+
+The results below show that the lambda value that minimizes MSE is .4132012. 
+The coefficients are given.
+```{r}
+crossval$lambda.min
+coef(crossval, s = "lambda.min")
+```
+
+Now, I will perform the same steps for the LASSO.
+```{r}
+grid=10^seq(2,-2,length=100)
+lasso <- glmnet(x = as.matrix(wid[, -1]), y = wid$y, alpha=1, lambda=grid)
+```
+
+```{r}
+lasso1 <- tidy(lasso)
+```
+
+Below, I will plot the coefficient estimates as lambda changes.
+```{r, echo=FALSE}
+ggplot(data=lasso1, aes(x=lambda, y=estimate, colour=term)) + 
+  geom_line() + coord_cartesian(xlim = c(0,2), ylim = c(-1, 1)) +
+  labs(title ="LASSO Coefficients", x = "Lambda", y = "Coefficient Estimate")
+```
+
+The graph below zooms in on the clustered lines above.
+```{r, echo=FALSE}
+ggplot(data=lasso1, aes(x=lambda, y=estimate, colour=term)) + 
+  geom_line() + coord_cartesian(xlim = c(0,.5), ylim = c(-.5, .5)) + 
+  labs(title ="LASSO Coefficients", x = "Lambda", y = "Coefficient Estimate")
+```
+
+Now, I will crossvalidate and plot the results.
+```{r}
+crossvallasso <- cv.glmnet(x = as.matrix(wid[, -1]), y = wid$y, alpha=1, lambda=grid)
+```
+```{r, echo=FALSE}
+plot(crossvallasso)
+```
+
+So, the optimal value of lambda, as shown below, is .1963041. The coefficient estimates are given.
+```{r}
+crossvallasso$lambda.min
+coef(crossvallasso, s = "lambda.min")
+```
+
+Need to discuss results****
