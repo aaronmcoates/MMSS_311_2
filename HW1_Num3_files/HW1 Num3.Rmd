@@ -2,7 +2,9 @@
 title: "HW1 Num3"
 author: "Aaron Coates"
 date: "4/17/2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -17,6 +19,7 @@ library(e1071)
 library(caret)
 ```
 
+First, I separate the data into training and test sets.
 ```{r}
 pol$group <- as.factor(pol$group)
 trainsize <- floor((2/3)*nrow(pol))
@@ -26,20 +29,32 @@ trainingdata <- pol[train_pol, ]
 testydata <- pol[-train_pol, ]
 ```
 
+Now, I will use SVM to classify the data. I use tune() to find the cost level that minimizes error.
 ```{r}
-tunez <- tune(svm, group ~ pol_margin + col_degree + house_income, data=trainingdata, kernel = "linear",
-                 ranges = list(cost = c(0.001, 0.01, 0.1, 1, 5, 10, 100)))
-summary(tunez)
+tunez <- tune(svm, group ~ pol_margin + col_degree + house_income, 
+              data=trainingdata, kernel = "linear",
+              ranges = list(cost = c(0.001, 0.01, 0.1, 1, 5, 10, 100)))
 swaggysvm <- tunez$best.model
 summary(swaggysvm)
+```
+
+Next, I will predict the results and display these in a table.
+```{r}
 svmpredict <- predict(swaggysvm, testydata)
 svmtable <- table("Prediction"=svmpredict, "True Party"=testydata[,1])
 svmtable
 ```
+So, the SVM is correct for 97% of the observations.
 
+Now, I will perform the same steps for Naive Bayes.
 ```{r}
 naive <- naiveBayes(group ~ pol_margin + col_degree + house_income, data=trainingdata)
+```
+
+I will use the model above to make predictions about the test data.
+```{r}
 naivepred <- predict(naive, testydata)
 naivetable <- table("Prediction"=naivepred, "True Party"=testydata[,1])
 naivetable
 ```
+So, the Naive Bayes model is correct 98% of the time.
