@@ -2,27 +2,24 @@ setwd("~/Documents/GitHub/MMSS_311_2")
 
 library(xml2)
 library(rvest)
+library(tm, tidytext)
+library(stringr)
 
-no <- read_html('/Users/aaroncoates/Desktop/cries.html', skip=0)
+no <- read_html('/Users/aaroncoates/Desktop/cries.html')
+nodes <- html_nodes(no, '.mw-category-group+ .mw-category-group a')
 
-nodes <- html_nodes(no, 'li a')
+country <- html_text(nodes)
+url <- html_attr(nodes, "href")
+fullurl <- url_absolute(url, 'https://en.wikipedia.org/wiki/Category:Member_states_of_the_Association_of_Southeast_Asian_Nations')
+fullurl
 
-text <- html_text(nodes)
-hrefy <- html_attr(nodes, "href")
-hrefy2 <- url_absolute(hrefy, 'https://en.wikipedia.org/wiki/Category:Member_states_of_the_Association_of_Southeast_Asian_Nations')
-hrefy2
-
-papi <- cbind(text, hrefy2)
-slay <- as.data.frame(papi, stringsAsFactors = F)
-
-newframe <- slay[3:12,]
+combined <- cbind(country, fullurl)
+finaldata <- as.data.frame(combined, stringsAsFactors = F)
 
 for(i in 1:10){
-  newframe$whyohwhy[i] <- newframe$hrefy2[i] %>%
+  finaldata$text[i] <- finaldata$fullurl[i] %>%
     read_html() %>%
-    html_nodes('div p') %>%
+    html_nodes('p+ ul li , p') %>%
     html_text() %>%
-    paste(collapse = '\n')
+  paste(collapse = ' ')
 }
-  
-  
