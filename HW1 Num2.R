@@ -82,8 +82,52 @@ prepopterms[1:20,1:2]
 #hashtags
 hashtagcorpus <- Corpus(VectorSource(as.vector(TwitterData$text)))
 
-processedhashtagcorpus <- hashtagcorpus %>%
-  tm_map(content_transformer(gsub), "[^\\#[:alnum:]\\s]", "")
+hashtag <- function(x) gsub("[^#[:alnum:][:space:]]", "", x)
+htcorpus2 <- tm_map(hashtagcorpus, content_transformer(hashtag))
 
-htDTMatrix <- DocumentTermMatrix(processedhashtagcorpus)
-tidy(htDTMatrix)
+htDTMatrix <- DocumentTermMatrix(htcorpus2)
+tidyhash <- tidy(htDTMatrix)
+
+popht <- tidyhash %>%
+  group_by(term) %>%
+  summarize(frequency = sum(count)) %>%
+  arrange(desc(frequency))
+
+hashtagdaddy <- subset(popht, grepl("#", term))
+hashtagdaddy[1:5, 1:2]
+
+Top5 <- Top5[ ,c('dates1', 'document')]
+for (i in 1:nrow(Top5)) {
+Top5$maga[i] <- Top5Baby %>%
+  filter(term == 'maga') %>%
+  filter(document < Top5$document[i]) %>%
+  sum(count)
+}
+
+
+
+
+Cries <- subset(TwitterData, grepl("#maga", text))
+
+Top5Baby <- subset(tidyhash, term == '#trump2016' | term == '#makeamericagreatagain' 
+                   | term == '#celebapprentice' | term == '#celebrityapprentice'
+                   | term == '#maga')
+
+dates1 <- TwitterData$created_at
+Top5 <- as.data.frame(dates1)
+Top5$realdate <- as.Date(Top5$dates1, '%m-%d-%Y')
+Top5$document <- c(1:17200)
+Top5 <- Top5[!duplicated(Top5$realdate), ]
+
+Top555 <- Top5Baby %>%
+  group_by(term) %>%
+  summarize(frequency = sum(count)) %>%
+  arrange(desc(frequency))
+
+Top5$maga[i] <- 
+
+
+
+Top6Baby <- subset(TwitterData, grepl('#trump2016', text) | grepl('#makeamericagreatagain', text) |
+                                        grepl('#celebapprentice', text) | grepl('#celebrityapprentice', text)
+                   | grepl('#maga', text))
