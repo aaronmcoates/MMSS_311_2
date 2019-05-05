@@ -1,3 +1,16 @@
+---
+title: "HW2 Num2"
+author: "Aaron Coates"
+date: "5/4/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+2.1 (a.)
+```{r}
 setwd("~/Documents/GitHub/MMSS_311_2")
 
 TwitterData <- read.csv('/Users/aaroncoates/Downloads/trumptweets.csv')
@@ -10,6 +23,10 @@ library(lubridate)
 library(stringr)
 library(ggplot2)
 library(tidyr)
+```
+
+2.1 (b.)
+```{r}
 tweetcorpus <- Corpus(VectorSource(as.vector(TwitterData$text)))
 
 processedcorpus <- tweetcorpus %>%
@@ -17,30 +34,45 @@ processedcorpus <- tweetcorpus %>%
   tm_map(content_transformer(tolower)) %>%
   tm_map(content_transformer(stemDocument), language = "english") %>%
   tm_map(content_transformer(removePunctuation))
+```
 
+2.1 (c.)
+```{r}
 DTMatrix <- DocumentTermMatrix(processedcorpus)
 SparseDTMatrix <- removeSparseTerms(DTMatrix, .99)
 inspect(SparseDTMatrix[1:10,1:10])
-tidymatrix <- tidy(PDTMatrix)
+```
 
+2.1 (d.)
+```{r}
+tidymatrix <- tidy(DTMatrix)
+```
+
+2.1 (e.)
+```{r}
 TfIdfMat <- DocumentTermMatrix(processedcorpus, control
                           = list(weighting = weightTfIdf))
 SparseTfIdfMat <- removeSparseTerms(TfIdfMat, .99)
 inspect(SparseTfIdfMat[1:10,1:10])
+```
 
+2.2 (a.)
+```{r}
 popterms <- tidymatrix %>%
   group_by(term) %>%
   summarize(frequency = sum(count)) %>%
   arrange(desc(frequency))
 popterms[1:20,1:2]
+```
 
+2.2 (b.) Post-Election
+```{r}
 TwitterDataDate <- TwitterData
 TwitterDataDate$date <- as.Date(TwitterData$created_at, '%m-%d-%Y')
 
 PostTwitterData <- subset(TwitterDataDate, date >= as.Date('2016-11-08'))
 PreTwitterData <- subset(TwitterDataDate, date <= as.Date('2016-11-08'))
 
-#post election
 posttweetcorpus <- Corpus(VectorSource(as.vector(PostTwitterData$text)))
 
 postprocessedcorpus <- posttweetcorpus %>%
@@ -51,7 +83,6 @@ postprocessedcorpus <- posttweetcorpus %>%
 
 postDTMatrix <- DocumentTermMatrix(postprocessedcorpus)
 postSparseDTMatrix <- removeSparseTerms(postDTMatrix, .99)
-inspect(postSparseDTMatrix[1:10,1:10])
 posttidymatrix <- tidy(postDTMatrix)
 
 postpopterms <- posttidymatrix %>%
@@ -59,8 +90,10 @@ postpopterms <- posttidymatrix %>%
   summarize(frequency = sum(count)) %>%
   arrange(desc(frequency))
 postpopterms[1:20,1:2]
+```
 
-#pre election
+2.2 (b.) Pre-Election
+```{r}
 pretweetcorpus <- Corpus(VectorSource(as.vector(PreTwitterData$text)))
 
 preprocessedcorpus <- pretweetcorpus %>%
@@ -79,8 +112,11 @@ prepopterms <- pretidymatrix %>%
   summarize(frequency = sum(count)) %>%
   arrange(desc(frequency))
 prepopterms[1:20,1:2]
+```
+For Pre-Election, we see many campaign related words, such as "Obama" and "Make America great", which was part of Trump's slogan, "Make America great again." For Post-Election, we see many of Trump's focuses while in the presidency, such as "fake news", "taxes", and "jobs."
 
-#hashtags
+2.2 (c.)
+```{r}
 hashtagcorpus <- Corpus(VectorSource(as.vector(TwitterData$text)))
 
 hashtag <- function(x) gsub("[^#[:alnum:][:space:]]", "", x)
@@ -90,7 +126,10 @@ htcorpus2 <- tm_map(hashtagcorpus, content_transformer(hashtag)) %>%
 
 htDTMatrix <- DocumentTermMatrix(htcorpus2)
 tidyhash <- tidy(htDTMatrix)
+```
 
+2.2 (d.)
+```{r}
 popht <- tidyhash %>%
   group_by(term) %>%
   summarize(frequency = sum(count)) %>%
@@ -98,7 +137,10 @@ popht <- tidyhash %>%
 
 hashtagdaddy <- subset(popht, grepl("#", term))
 hashtagdaddy[1:5, 1:2]
+```
 
+2.2 (e.)
+```{r}
 DateHashtag <- tidyhash %>%
   subset(term == '#maga' | term == '#trump2016'
          | term == '#celebapprentice' | term == '#celebrityapprentice'
@@ -119,29 +161,16 @@ maga <- final %>%
   summarise(frequency = sum(count))
 
 maga <- arrange(maga, month)
+```
 
-all_dates2 = seq(as.Date(as.yearmon(min(maga$month))), as.Date(as.yearmon(max(maga$month))), by="month")
-date2 = as.data.frame(all_dates2)
-date2$month <- format(date2$all_dates, '%Y-%m')
-
-posts_by_date_clean2 = merge(date2,
-                            maga,
-                            by.x='month',
-                            by.y='month',
-                            all.x=T,
-                            all.y=T)
-
-posts_by_date_clean2$frequency[is.na(posts_by_date_clean2$frequency)] = 0
-posts_by_date_clean2$term[is.na(posts_by_date_clean2$term)] = '#trump2016'
-
-
-ggplot(data=posts_by_date_clean2, aes(x=month, y=frequency, group = term, colour = term)) +
+```{r, echo=FALSE, fig.width=8}
+ggplot(data=maga, aes(x=month, y=frequency, group = term, colour = term)) +
   geom_line() +
-  geom_point(size=4, shape=21, fill="white") + 
-  scale_y_continuous(limits = c(1, 100)) + coord_flip()
+  geom_point(size=4, shape=21, fill="white") + coord_flip()
+```
 
-#rmarkdown size
-
+2.2 (f.)
+```{r}
 Crooked <- TwitterData
 Crooked <- select(Crooked, c(text, created_at)) %>%
   unnest_tokens(bigram, text, token='ngrams', n=2)
@@ -154,29 +183,14 @@ for (i in 1:nrow(Crooked)) {
   Crooked$count[i] =1
 }
 
-install.packages('zoo')
-library(zoo)
-
-
 finalcrooked <- Crooked %>%
   group_by(month) %>%
   summarise(frequency = sum(count))
+```
 
-all_dates = seq(as.Date(as.yearmon(min(finalcrooked$month))), as.Date(as.yearmon(max(finalcrooked$month))), by="month")
-date = as.data.frame(all_dates)
-date$month <- format(date$all_dates, '%Y-%m')
-
-posts_by_date_clean = merge(date,
-                            finalcrooked,
-                            by.x='month',
-                            by.y='month',
-                            all.x=T,
-                            all.y=T)
-
-posts_by_date_clean$frequency[is.na(posts_by_date_clean$frequency)] = 0
-
-ggplot(data=posts_by_date_clean, aes(x=month, y=frequency)) +
+```{r, echo=FALSE, fig.width=4}
+ggplot(data=finalcrooked, aes(x=month, y=frequency)) +
   geom_col(color='blue', fill='red') 
-
+```
 
 

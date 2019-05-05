@@ -1,20 +1,45 @@
+---
+title: "Homework 2, Number 1"
+author: "Aaron Coates"
+date: "5/4/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
 setwd("~/Documents/GitHub/MMSS_311_2")
 
 library(xml2)
 library(rvest)
 library(tm, tidytext)
 library(stringr)
+```
 
+1.1 (a.)
+```{r}
 no <- read_html('/Users/aaroncoates/Desktop/cries.html')
-nodes <- html_nodes(no, '.mw-category-group+ .mw-category-group a')
+```
 
+1.1 (b.)
+```{r}
+nodes <- html_nodes(no, '.mw-category-group+ .mw-category-group a')
+```
+
+1.1 (c.)
+```{r}
 country <- html_text(nodes)
 url <- html_attr(nodes, "href")
 fullurl <- url_absolute(url, 'https://en.wikipedia.org/wiki/Category:Member_states_of_the_Association_of_Southeast_Asian_Nations')
-fullurl
 combined <- cbind(country, fullurl)
 finaldata <- as.data.frame(combined, stringsAsFactors = F)
+finaldata
+```
 
+1.1(d.)
+```{r}
 for(i in 1:10){
   finaldata$text[i] <- finaldata$fullurl[i] %>%
     read_html() %>%
@@ -22,3 +47,8 @@ for(i in 1:10){
     html_text() %>%
   paste(collapse = ' ')
 }
+```
+
+
+
+
