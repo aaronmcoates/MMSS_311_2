@@ -1,7 +1,6 @@
 setwd("~/Documents/GitHub/MMSS_311_2")
 
 TwitterData <- read.csv('/Users/aaroncoates/Downloads/trumptweets.csv')
-
 library(tidytext)
 library(tm)
 library(dplyr)
