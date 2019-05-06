@@ -2,7 +2,9 @@
 title: "Homework 2, Number 1"
 author: "Aaron Coates"
 date: "5/4/2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -20,7 +22,7 @@ library(stringr)
 
 1.1 (a.)
 ```{r}
-no <- read_html('/Users/aaroncoates/Desktop/cries.html')
+no <- read_html('/Users/aaroncoates/Desktop/cries.htm')
 ```
 
 1.1 (b.)

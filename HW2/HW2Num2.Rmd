@@ -2,7 +2,9 @@
 title: "HW2 Num2"
 author: "Aaron Coates"
 date: "5/4/2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -163,7 +165,7 @@ maga <- final %>%
 maga <- arrange(maga, month)
 ```
 
-```{r, echo=FALSE, fig.width=8}
+```{r, echo=FALSE, fig.height=13, fig.width=13}
 ggplot(data=maga, aes(x=month, y=frequency, group = term, colour = term)) +
   geom_line() +
   geom_point(size=4, shape=21, fill="white") + coord_flip()
@@ -188,7 +190,7 @@ finalcrooked <- Crooked %>%
   summarise(frequency = sum(count))
 ```
 
-```{r, echo=FALSE, fig.width=4}
+```{r, echo=FALSE, fig.width=9}
 ggplot(data=finalcrooked, aes(x=month, y=frequency)) +
   geom_col(color='blue', fill='red') 
 ```
