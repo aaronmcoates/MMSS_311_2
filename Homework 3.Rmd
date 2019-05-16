@@ -26,6 +26,7 @@ library(mixtools)
 ```
 
 1.1
+
 ```{r}
 manifestos <- read_csv("/Users/aaroncoates/Downloads/manifestos.csv")
 
@@ -45,6 +46,7 @@ tidymani <- manifestos %>%
 ```
 
 1.2
+
 ```{r}
 eucdist.mani <- dist(tidymani) %>%
   as.matrix()
@@ -57,8 +59,11 @@ image.plot(1:ncol(eucdist.mani), 1:ncol(eucdist.mani), eucdist.mani, axes=F, xla
   axis(1, 1:ncol(eucdist.mani), manifestosabc$doc_id, cex.axis=.7, las=2)
   axis(2, 1:ncol(eucdist.mani), manifestosabc$doc_id, cex.axis=.7, las=2)
 ```
-Add words.
+
+Using Euclidean distance, it seems as though the Green Party and the DemUnion have very similar manifestos. The Wales and the Green Party are also just as similar. In addition, LibDem and the Conservative Party are somewhat similar, as are Wales and DemUnion.
+
 1.3
+
 ```{r}
 cosdist.mani <- dist(tidymani, method="cosine") %>%
   as.matrix()
@@ -69,11 +74,15 @@ image.plot(1:ncol(cosdist.mani), 1:ncol(cosdist.mani), cosdist.mani, axes=F, xla
 axis(1, 1:ncol(cosdist.mani), manifestosabc$doc_id, cex.axis=.7, las=2)
 axis(2, 1:ncol(cosdist.mani), manifestosabc$doc_id, cex.axis=.7, las=2)
 ```
-Add words.
+
+Using cosine distance, LibDem and Conservative are the closest two parties. In addition, the Labour and Conservative parties are similar, as are the LibDem and Labour parties.
+
 1.4
-Add words.
+
+In principle, cosine distance is the most accurate measure for this particular application. This is because cosine distance controls for varying lengths of each manifesto and is able to produce a similarity index that is independent of manifesto length.
 
 2.1
+
 ```{r}
 sanny <- read_csv("/Users/aaroncoates/Downloads/311_sanitation_requests_2019.csv")
 sanny <- sanny[!is.na(sanny$Latitude), ]
@@ -86,17 +95,20 @@ sanny$cluster <- as.factor(clusty)
 ```
 
 2.2
+
 ```{r}
 table(sanny$`Borough`, sanny$cluster)
 ```
-Add words.
+The clusters match the political boundaries somewhat well. Queens, the Bronx, and Staten Island are each encompassed in only one cluster. Brooklyn and Manhattan are split up.
 
 2.3
+
 ```{r, echo=FALSE}
 ggplot(sanny, aes(x=Latitude, y=Longitude)) + geom_point(alpha=.1, size=.5, col= sanny$cluster)
 ```
 
 2.4
+
 ```{r}
 centroidz <- as.data.frame(kmeanmat$centers)
 ```
@@ -109,17 +121,22 @@ ggplot(sanny, aes(x=Latitude, y=Longitude, color=sanny$cluster)) + geom_point(al
 ```
 
 2.5
+
 ```{r}
 kmeanmat3 <- kmeans(select(sanny, c(Latitude, Longitude)), 3, nstart=50)
 clusty3 <- kmeanmat3$cluster
 sanny$cluster3 <- as.factor(clusty3)
 table(sanny$`Borough`, sanny$cluster3)
 ```
+
 First, plot without centers.
+
 ```{r, echo=FALSE, fig.align='center'}
 ggplot(sanny, aes(x=Latitude, y=Longitude)) + geom_point(alpha=.1, size=.5, col= sanny$cluster3)
 ```
+
 Then, plot with centers.
+
 ```{r}
 centroidz3 <- as.data.frame(kmeanmat3$centers)
 ```
@@ -132,6 +149,7 @@ ggplot(sanny, aes(x=Latitude, y=Longitude, color=sanny$cluster3)) + geom_point(a
 ```
 
 2.6
+
 ```{r}
 sumsq <- numeric(15)
 for (i in 1:15){
@@ -145,12 +163,15 @@ sumsq$k <- c(1:15)
 ```
 
 2.7
-```{r}
+
+```{r, echo=FALSE}
 ggplot(sumsq, aes(k, sumsq)) + geom_line() + geom_point() + ggtitle("Elbow Plot") + xlab("Number of Clusters") + ylab("Within-Cluster Sum of Squares")
 ```
-Add words.
+
+Since the new facilities are very expensive to create, it seems as though using four facilities would fit our results the most well. Increasing the number of centers from four would only slightly decrease Sum of Squared Distance.
 
 2.8
+
 ```{r}
 kmeanmat4 <- kmeans(select(sanny, c(Latitude, Longitude)), 4, nstart=50)
 clusty4 <- kmeanmat4$cluster
@@ -166,9 +187,11 @@ ggplot(sanny, aes(x=Latitude, y=Longitude, color=sanny$cluster4)) + geom_point(a
 ```
 
 2.9
-Add words.
+
+For this application, Euclidean distance finds clusters of calls that are the closest based solely on latitude and longitude. However, this will not take into account the specific geography of New York City. For instance, perhaps there is a water barrier that significantly increases the travel from a facility to a customer call. Euclidean distance would not be able to take this into account when forming clusters.
 
 3.1-3.2
+
 ```{r}
 final <- sanny[sample(1:nrow(sanny), 500, replace=FALSE),]
 ```
@@ -177,6 +200,7 @@ plot(mvnormalmixEM(select(final, c(Latitude, Longitude)), k=2), whichplots=2, xl
 ```
 
 3.3
+
 ```{r, echo=FALSE}
 plot(mvnormalmixEM(select(final, c(Latitude, Longitude)), k=3), whichplots=2, xlab2="Latitude", ylab2="Longitude")
 ```
