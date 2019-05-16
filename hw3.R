@@ -26,6 +26,30 @@ tidymani <- manifestos %>%
   removeSparseTerms(0.99) %>%
   as.matrix()
 
+
+removeSpecialChars <- function(x) gsub("[^a-zA-Z0-9 ]","",x)
+
+corpus3 <- VCorpus(DataframeSource(manifestos))
+corpus4 <- corpus3 %>% 
+  tm_map(removePunctuation) %>%
+  tm_map(content_transformer(removeSpecialChars)) %>%
+  tm_map(content_transformer(removeNumbers)) %>%
+  tm_map(removeWords, stopwords("english")) %>%
+  tm_map(content_transformer(tolower)) %>%
+  tm_map(content_transformer(stemDocument), language = "english")
+  
+
+dtm <- DocumentTermMatrix(corpus4)
+dtm <- removeSparseTerms(dtm, 0.97)
+
+dtm <- dtm %>%
+  as.matrix() %>%
+  tidy()
+
+manifestos2 <- read.csv("/Users/aaroncoates/Downloads/manifestos.csv")
+manifestos2[2,2]
+
+
 eucdist.mani <- dist(tidymani) %>%
   as.matrix()
 
