@@ -78,7 +78,3 @@ ggplot(data = counties, mapping = aes(x = long, y = lat, group = group)) +
   coord_fixed(1.3) + 
   geom_polygon(color = "black", fill = "gray")
 
-
-
-
-ggplot(hey10, aes(LAT2, LONG2), color=) + geom_point()

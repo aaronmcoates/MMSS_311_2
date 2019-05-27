@@ -1,0 +1,121 @@
+---
+title: "Homework 4"
+author: "Aaron Coates"
+date: "5/24/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd("~/Documents/GitHub/MMSS_311_2")
+
+library(tidytext)
+library(tm)
+library(readr)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(proxy)
+library(fields)
+library(mixtools)
+library(topicmodels)
+library(stm)
+```
+
+1.1
+
+```{r}
+set.seed(732)
+Ari <- read_csv("/Users/aaroncoates/Downloads/tx_deathrow_full.csv")
+
+#Removing those who gave no statement
+Ari <- Ari[is.na(Ari$'Last Statement')!=1, ]
+
+Taylor <- Ari %>% 
+  unnest_tokens(word, 'Last Statement') %>%
+  anti_join(stop_words) %>%
+  group_by(Execution) %>%
+  count(word) %>%
+  cast_dtm(Execution, word, n) %>%
+  as.matrix()
+```
+
+1.2
+
+```{r}
+Britney <- LDA(Taylor, k=10)
+```
+
+1.3
+
+```{r}
+Kelly <- Britney %>%
+  tidy() %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  ungroup()
+
+CarlyRae <- ggplot(Kelly, aes(term, beta, fill= as.factor(topic))) +
+  facet_wrap(~ topic, scales= 'free_y', nrow = 2) + coord_flip() + 
+  geom_col(show.legend = FALSE) + xlab('Term') + ylab('Beta') +
+  labs(title="Topic Modeling of Death Row Final Statements, LDA", subtitle="Top 10 Words Per Topic")
+```
+
+```{r, echo=FALSE, fig.width=9}
+CarlyRae
+```
+
+2.1
+
+```{r}
+Beyonce <- stm::readCorpus(Taylor, type = 'dtm')
+```
+
+2.2
+
+```{r, results="hide"}
+#Removing rows that were deleted during pre-processing from the original dataframe
+Normani <- as.data.frame(Taylor)
+Normani$ExecutionNumber <- as.numeric(rownames(Normani))
+Camila <- semi_join(Ari, Normani, by = c('Execution' = 'ExecutionNumber'))
+
+Adele <- stm(documents = Beyonce$documents, vocab = Beyonce$vocab,
+               K = 10, prevalence = ~ Race, data = Camila)
+```
+
+2.3
+
+```{r}
+summary(Adele)
+```
+
+```{r}
+plot.STM(Adele, type = "summary", n=5, xlim=c(0,1))
+```
+
+```{r}
+Miley <- tidy(Adele) %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  ungroup()
+
+Demi <- ggplot(Miley, aes(term, beta, fill= as.factor(topic))) +
+  facet_wrap(~ topic, scales= 'free_y', nrow = 2) + coord_flip() + 
+  geom_col(show.legend = FALSE) + xlab('Term') + ylab('Beta') +
+  labs(title="Topic Modeling of Death Row Final Statements, STM", subtitle="Top 10 Words Per Topic")
+```
+
+```{r, echo=FALSE, fig.width=10}
+Demi
+```
+
+2.4
+
+The topics we find when conditioning on race are somewhat different from those we find when using traditional LDA. For instance, using traditional LDA, the 10 topics are not easily differentiated. For instance, the themes of "love", "god", and "apologize" are prevalent in most, if not all, of the topics. The only distinct topic seems to be topic 1, where we see a focus on police, crime, and the law.
+
+When using STM and conditioning on race, the topics are mostly similar, as we see a dominance of topics relating to "love", "god", and "apologize". However, the results are slightly different because topics now feature certain words that may be distinct among certain regions and ethnicities. For instance, we see "Mexico", "Allah", and "black" appear in the top 10 lists for certain topics. This helps to illuminate certain topics and words that members of distinct races may have mentioned in their last statements.

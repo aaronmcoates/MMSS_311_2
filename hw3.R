@@ -128,5 +128,3 @@ plot(mvnormalmixEM(select(final, c(Latitude, Longitude)), k=2), whichplots=2, xl
 plot(mvnormalmixEM(select(final, c(Latitude, Longitude)), k=3), whichplots=2, xlab2="Latitude", ylab2="Longitude")
 
 
-
-
