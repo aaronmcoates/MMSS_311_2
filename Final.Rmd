@@ -1,3 +1,13 @@
+---
+title: "Final Project"
+author: "Aaron Coates"
+date: "6/8/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, results='hide'}
 setwd("/Users/aaroncoates/Documents/GitHub/MMSS_311_2")
 
 library(tidytext)
@@ -17,6 +27,7 @@ library(devtools)
 library(ggmap)
 library(tidyr)
 library(RColorBrewer)
+```
 
 USAData <- read_csv('/Users/aaroncoates/Desktop/ML Final/DataUSA Health and Safety.csv')
 GoodVars <- c(1, 7, 12, 17, 22)
@@ -110,7 +121,7 @@ Centers <- gather(Centers, Variable, Value, -Clusters)
 
 ggplot(Centers, aes(Clusters, Variable, 
                     fill=cut(Value, c(-20, -10, -3, -2, -1, -.5, 0, .5, 1, 2, 3, 10, 20)))) +
-  geom_raster() + scale_fill_brewer(palette = "PiYG") 
+  geom_raster() + scale_fill_brewer(palette = "PiYG") +
   guides(fill=guide_legend(title="Proportion of State")) + ggtitle('State County Proportion per Cluster')
 
 ClusterTotals <- DataSet %>%
@@ -145,33 +156,15 @@ CountyTotals$State <- rownames(CountyTotals)
 StateTable <- inner_join(StateTable, CountyTotals, 'State')
 StateTable$Prop <- StateTable$n / StateTable$Total
 
-
-for (i in 1:612){
-  if(as.integer(StateTable$State[i] %in% c('AK','CA','HI','NV','OR','WA'))){
-    StateTable$Region == 'Far West'
-  } else {
-  if(as.integer(StateTable$State[i] %in% c('CO','ID','MO','UT','WY'))){
-      StateTable$Region == 'Rocky Mountain'
-  }}
-}
-
-StateTable$Region <- sapply(StateTable$State, function(x){
-  if(StateTable$State %in% c('AK','CA','HI','NV','OR','WA')){
-    'Far West'
-  }}) else {
-    0
-  }})
-
-
-
-if(StateTable$State == 'AK'|'CA'|'HI'|'NV'|'OR'|'WA') StateTable$Region =='Far West'
-
-
 ggplot(StateTable, aes(Clusters, State, 
   fill=cut(Prop, c(1, .875, .75, .625, .5, .375, .25, .125, .0001, 0), 
            labels = c("0", "(0,.125]", "(.125, .25]", "(.25, .375]", "(.375, .5]",
                       "(.5, .625]", "(.625, .75]", "(.75, .875]", "(.875, 1]"), include.lowest = TRUE))) +
   geom_tile() + scale_fill_brewer(palette = "BuGn", direction=-1) + 
   guides(fill=guide_legend(title="Proportion of State")) + ggtitle('State County Proportion per Cluster')
+```
 
+```{r}
+
+```
 
