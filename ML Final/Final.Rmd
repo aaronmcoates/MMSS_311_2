@@ -14,7 +14,7 @@ output:
   Thus, for this project, data will be combined from economic, environmental, health, safety, and educational measures of prosperity to look at relative prosperity levels throughout the United States. The project will look to investigate and display the qualitative differences in prosperity levels that exist throughout the United States at the county level while also investigating whether or not these differences in prosperity are tied to geographic location. K-means clustering will be applied to assist in the task of classifying 'quality of life' groupings that exist throughout the United States, and an elbow plot will be utilized to determine the appropriate number of clusters.
 
 ```{r setup, results='hide', message=FALSE, warning=FALSE}
-setwd("/Users/aaroncoates/Documents/GitHub/MMSS_311_2")
+setwd("/Users/aaroncoates/Documents/GitHub/MMSS_311_2/ML Final")
 Packages <- c('tidytext', 'tm', 'readr', 'dplyr', 'stringr', 'ggplot2', 'proxy', 
               'fields', 'mixtools', 'xml2', 'rvest', 'maps', 'mapdata', 'devtools', 
               'ggmap', 'tidyr', 'RColorBrewer', 'usmap', 'scales')
@@ -28,7 +28,7 @@ lapply(Packages, require, character.only = TRUE)
   These variables were chosen for a variety of reasons. Obesity and smoking rates can give a general picture of the overall physical wellbeing and health-related prosperity of citizens of the United States. Air pollution can serve as an environmental wellness indicator, or a predictor of overall pollution levels and sanitation in a given county. The crime rate can serve as an indicator of relative safety in a given county.
 
 ```{r, message=FALSE, warning=FALSE}
-USAData <- read_csv('/Users/aaroncoates/Desktop/ML Final/DataUSA Health and Safety.csv')
+USAData <- read_csv('DataUSA Health and Safety.csv')
 GoodVars <- c(1, 7, 12, 17, 22)
 USAData <- USAData[ ,GoodVars]
 usanames <- c("FIPS", "Obesity", "Smoking", "AirPol", "Crime")
@@ -44,17 +44,17 @@ USAData$FIPS <- gsub("^.*US", "", USAData$FIPS) %>%
   These variables each serve as an indicator of a county's prosperity. Household income and unemployment rates serve as measures of economic prosperity in a given county, and high school graduation rates show the educational achievement and access available in a given county. Demographic information, such as the percentage of white people in a county, serves as an indicator of diversity within a county. The family household rate can serve as an indicator of whether a neighborhood is welcoming to children and families. This could perhaps serve as a qualitative indicator, measuring whether or not a county is a place where families want to 'settle down.'
 
 ```{r, message=FALSE, warning=FALSE}
-MedHouseInc <- read_csv('/Users/aaroncoates/Desktop/ML Final/MedHousInc.csv')
+MedHouseInc <- read_csv('MedHousInc.csv')
 MedHouseInc <- MedHouseInc[, 1:3]
-HSDiploma <- read_csv('/Users/aaroncoates/Desktop/ML Final/HSDiploma.csv')
+HSDiploma <- read_csv('HSDiploma.csv')
 HSDiploma <- HSDiploma[, 2:3]
-WhitePop <- read_csv('/Users/aaroncoates/Desktop/ML Final/WhitePop.csv')
+WhitePop <- read_csv('WhitePop.csv')
 WhitePop <- WhitePop[,2:3]
-FamHouseholds <- read_csv('/Users/aaroncoates/Desktop/ML Final/FamHouseholds.csv')
+FamHouseholds <- read_csv('FamHouseholds.csv')
 FamHouseholds <- FamHouseholds[,2:3]
-UnempRate <- read_csv('/Users/aaroncoates/Desktop/ML Final/UnempRate.csv')
+UnempRate <- read_csv('UnempRate.csv')
 UnempRate <- UnempRate[,2:3]
-Pop <- read_csv('/Users/aaroncoates/Desktop/ML Final/Pop.csv')
+Pop <- read_csv('Pop.csv')
 Pop <- Pop[,2:3]
 
 StatsAmerica <- full_join(MedHouseInc, HSDiploma, "FIPS Code") %>%
@@ -166,7 +166,7 @@ Each of the other clusters are more distinct in nature. Cluster 3 captures the l
 
 Finally, Cluster 10 represents the 'average' county in the United States. Looking at the graph, none of the covariate levels deviate far from the overall mean, except for a slightly elevated air pollution level. Cluster 8 is similar to Cluster 10 but is distinguished by its slightly higher nonwhite populations, higher crime levels, and lower levels of family housing.
 
-Thus, it is possible to make conclusions about relative prosperity levels throughout the United States. For instance, it is clear in Clusters 1, 2, 6, and 7 that we can see higher levels of minority populations being plagued by negative characteristics, such as high levels of smoking and obesity and low levels of high school graduation and household income.
+Thus, it is possible to make conclusions about relative prosperity levels throughout the United States. For instance, it is clear in Clusters 1, 6, and 7 that we can see higher levels of minority populations being plagued by negative characteristics, such as high levels of smoking and obesity and low levels of high school graduation and household income.
 
 Beyond this, we can see that some counties focus on health outcomes the most (Cluster 4), some counties have healthy environmental indicators (Cluster 3), and some counties have seemed to find a happy medium (Cluster 9). These results show that there is indeed a wide variation in relative prosperity throughout the United States at the county level.
 
